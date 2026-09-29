@@ -11,18 +11,19 @@ import { ApkDownloadBanner } from './components/ApkDownloadBanner';
 import { DocsView } from './components/DocsView';
 import { PrintCalendar } from './components/PrintCalendar';
 import { DateConverterModal } from './components/DateConverterModal';
-import { Sun, Sparkles, Smartphone, MapPin, ArrowRightLeft, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { AllRemindersView } from './components/AllRemindersView';
+import { Sun, Smartphone, MapPin, ArrowRightLeft, Bell, Calendar as CalendarIcon } from 'lucide-react';
 import { toTeluguNumber } from './utils/teluguNumbers';
 
 export default function App() {
-  // Navigation & Settings State
+  // Navigation & Settings State - General English numbers by default!
   const [currentYear, setCurrentYear] = useState<number>(2027);
   const [currentMonth, setCurrentMonth] = useState<number>(4); // Default to April 2027 (Ugadi month!)
   const [selectedDate, setSelectedDate] = useState<string>('2027-04-07'); // Default to Ugadi 2027!
   const [language, setLanguage] = useState<'te' | 'en'>('te');
-  const [useTeluguNumerals, setUseTeluguNumerals] = useState<boolean>(true);
+  const [useTeluguNumerals, setUseTeluguNumerals] = useState<boolean>(false); // DEFAULT: English General Numbers!
   const [selectedCity, setSelectedCity] = useState<CityOption>(TELUGU_CITIES[0]); // Default Hyderabad
-  const [activeTab, setActiveTab] = useState<'calendar' | 'day' | 'festivals' | 'muhurtam' | 'docs'>('calendar');
+  const [activeTab, setActiveTab] = useState<'calendar' | 'day' | 'festivals' | 'muhurtam' | 'reminders' | 'docs'>('calendar');
 
   // Modals State
   const [isDayModalOpen, setIsDayModalOpen] = useState<boolean>(false);
@@ -215,6 +216,16 @@ export default function App() {
                 <span>{isTe ? 'తేదీ మార్పిడి / శోధన' : 'Date Converter'}</span>
               </button>
 
+              {/* Reminders Quick Jump Button */}
+              <button
+                onClick={() => setActiveTab('reminders')}
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-950/60 border border-amber-800/50 hover:bg-amber-900/60 text-amber-300 transition-colors"
+                title="Manage All Reminders"
+              >
+                <Bell className="w-3.5 h-3.5 text-amber-400" />
+                <span>{isTe ? 'రిమైండర్లు' : 'Reminders'}</span>
+              </button>
+
               {/* Location Picker */}
               <button
                 onClick={() => setIsCityModalOpen(true)}
@@ -281,6 +292,13 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'reminders' && (
+          <AllRemindersView
+            onSelectDate={handleSelectDate}
+            language={language}
+          />
+        )}
+
         {activeTab === 'docs' && <DocsView language={language} />}
       </main>
 
@@ -336,7 +354,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2 text-amber-300">
             <span>🕉️</span>
-            <span className="font-semibold">తెలుగు పంచాంగం ౨౦౨౭ (2027)</span>
+            <span className="font-semibold">తెలుగు పంచాంగం 2027</span>
             <span className="text-slate-500">|</span>
             <span className="text-slate-400">అమాంత మానం · లహరి అయనాంశ</span>
           </div>
@@ -351,10 +369,18 @@ export default function App() {
             </button>
             <span>·</span>
             <button
+              onClick={() => setActiveTab('reminders')}
+              className="hover:text-amber-300 transition-colors flex items-center space-x-1"
+            >
+              <Bell className="w-3.5 h-3.5" />
+              <span>{isTe ? 'రిమైండర్లు' : 'Reminders'}</span>
+            </button>
+            <span>·</span>
+            <button
               onClick={() => setActiveTab('docs')}
               className="hover:text-amber-300 transition-colors"
             >
-              {isTe ? 'పంచాంగ గణన పద్ధతులు' : 'Calculation Conventions'}
+              {isTe ? 'పంచాంగ సూత్రాలు' : 'Calculation Rules'}
             </button>
             <span>·</span>
             <button

@@ -1,7 +1,8 @@
 import React from 'react';
 import { PanchangamDay } from '../engine/types';
 import { toTeluguNumber } from '../utils/teluguNumbers';
-import { Sparkles, Sun, Moon } from 'lucide-react';
+import { Sparkles, Sun, Moon, Bell } from 'lucide-react';
+import { getRemindersForDate } from '../engine/reminders';
 
 interface CalendarGridProps {
   days: PanchangamDay[];
@@ -62,7 +63,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
         <div className="grid grid-cols-7 auto-rows-fr divide-x divide-y divide-amber-900/30">
           {/* Leading Blank Cells */}
           {blankDays.map((_, i) => (
-            <div key={`blank-${i}`} className="bg-slate-950/40 min-h-[92px] md:min-h-[110px]" />
+            <div key={`blank-${i}`} className="bg-slate-950/40 min-h-[92px] md:min-h-[115px]" />
           ))}
 
           {/* Days of Month */}
@@ -74,6 +75,8 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             const hasFestival = day.festivals && day.festivals.length > 0;
             const isPournami = day.isPournami;
             const isAmavasya = day.isAmavasya;
+            const dayReminders = getRemindersForDate(day.date);
+            const hasReminders = dayReminders.length > 0;
 
             // Short tithi display
             const shortTithi = day.tithi
@@ -94,9 +97,10 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                     : 'bg-slate-900/70 hover:bg-slate-800/80'
                 }`}
               >
-                {/* Top Row: Gregorian Date (Left) & Telugu Numeral / Badges (Right) */}
+                {/* Top Row: Date Number (Left) & Special Badges (Right) */}
                 <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center space-x-1.5">
+                    {/* English / General Numbers */}
                     <span
                       className={`text-base md:text-xl font-bold font-serif-num ${
                         isSunday
@@ -113,14 +117,24 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                     )}
                   </div>
 
-                  {/* Special Markers: Pournami / Amavasya */}
+                  {/* Special Markers: Reminders, Pournami, Amavasya */}
                   <div className="flex items-center space-x-1">
+                    {hasReminders && (
+                      <span
+                        className="inline-flex items-center text-[10px] text-amber-400 bg-amber-950/70 border border-amber-500/50 rounded-full px-1 py-0.2"
+                        title={`${dayReminders.length} reminder(s)`}
+                      >
+                        <Bell className="w-2.5 h-2.5 mr-0.5" />
+                        <span>{dayReminders.length}</span>
+                      </span>
+                    )}
+
                     {isPournami && (
                       <span
                         className="inline-flex items-center text-[10px] md:text-xs font-semibold px-1 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40"
                         title="పౌర్ణమి (Pournami)"
                       >
-                        🌕 {isTe ? 'పౌర్ణమి' : 'Full Moon'}
+                        🌕
                       </span>
                     )}
                     {isAmavasya && (
@@ -128,7 +142,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                         className="inline-flex items-center text-[10px] md:text-xs font-semibold px-1 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700"
                         title="అమావాస్య (Amavasya)"
                       >
-                        🌑 {isTe ? 'అమావాస్య' : 'New Moon'}
+                        🌑
                       </span>
                     )}
                   </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { PanchangamDay } from '../engine/types';
 import { NAKSHATRAS } from '../engine/panchangam';
 import { generateSankalpam, calculateTarabalam } from '../engine/sankalpam';
+import { RemindersSection } from './RemindersSection';
 import {
   X,
   Sun,
@@ -15,10 +16,10 @@ import {
   Share2,
   Copy,
   Check,
-  Compass,
   ScrollText,
   Star,
   ExternalLink,
+  Bell,
 } from 'lucide-react';
 import { toTeluguNumber } from '../utils/teluguNumbers';
 
@@ -40,11 +41,11 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
   useTeluguNumerals,
 }) => {
   const isTe = language === 'te';
-  const [activeSubTab, setActiveSubTab] = useState<'panchangam' | 'timeline' | 'sankalpam' | 'tarabalam' | 'share'>('panchangam');
+  const [activeSubTab, setActiveSubTab] = useState<'panchangam' | 'reminders' | 'timeline' | 'sankalpam' | 'tarabalam' | 'share'>('panchangam');
   const [copiedText, setCopiedText] = useState(false);
   const [selectedJanmaNakshatra, setSelectedJanmaNakshatra] = useState<number>(1); // Default Ashwini
 
-  // Format date display
+  // Format date display (general English numbers by default)
   const dateParts = day.date.split('-');
   const y = parseInt(dateParts[0], 10);
   const m = parseInt(dateParts[1], 10);
@@ -133,6 +134,17 @@ ${day.festivals.length > 0 ? `విశేషం: ${day.festivals.map(f => f.nam
             }`}
           >
             📋 {isTe ? 'పంచాంగ వివరాలు' : 'Panchangam Details'}
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('reminders')}
+            className={`px-3 py-1.5 rounded-lg whitespace-nowrap font-medium transition-all ${
+              activeSubTab === 'reminders'
+                ? 'bg-amber-600 text-slate-950 font-bold shadow'
+                : 'text-slate-300 hover:text-amber-200 hover:bg-slate-900'
+            }`}
+          >
+            🔔 {isTe ? 'రిమైండర్లు & నోట్స్' : 'Reminders & Notes'}
           </button>
 
           <button
@@ -415,7 +427,12 @@ ${day.festivals.length > 0 ? `విశేషం: ${day.festivals.map(f => f.nam
             </>
           )}
 
-          {/* TAB 2: Visual Muhurtam Timeline */}
+          {/* TAB 2: Reminders & Notes Section */}
+          {activeSubTab === 'reminders' && (
+            <RemindersSection day={day} language={language} />
+          )}
+
+          {/* TAB 3: Visual Muhurtam Timeline */}
           {activeSubTab === 'timeline' && (
             <div className="space-y-4">
               <div className="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-3">
@@ -493,7 +510,7 @@ ${day.festivals.length > 0 ? `విశేషం: ${day.festivals.map(f => f.nam
             </div>
           )}
 
-          {/* TAB 3: Puja Sankalpam Generator */}
+          {/* TAB 4: Puja Sankalpam Generator */}
           {activeSubTab === 'sankalpam' && (
             <div className="space-y-4">
               <div className="p-4 rounded-xl bg-gradient-to-r from-red-950/70 to-amber-950/70 border border-amber-600/40 shadow-lg space-y-3">
@@ -526,7 +543,7 @@ ${day.festivals.length > 0 ? `విశేషం: ${day.festivals.map(f => f.nam
             </div>
           )}
 
-          {/* TAB 4: Tarabalam Calculator */}
+          {/* TAB 5: Tarabalam Calculator */}
           {activeSubTab === 'tarabalam' && (
             <div className="space-y-4">
               <div className="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-3">
@@ -588,7 +605,7 @@ ${day.festivals.length > 0 ? `విశేషం: ${day.festivals.map(f => f.nam
             </div>
           )}
 
-          {/* TAB 5: WhatsApp / Social Share Card */}
+          {/* TAB 6: WhatsApp / Social Share Card */}
           {activeSubTab === 'share' && (
             <div className="space-y-4">
               <div className="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-3">

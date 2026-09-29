@@ -4,13 +4,13 @@ import {
   MapPin,
   Globe,
   Printer,
-  Download,
   Clock,
   Sparkles,
   BookOpen,
   ChevronLeft,
   ChevronRight,
   Smartphone,
+  Bell,
 } from 'lucide-react';
 import { CityOption } from '../engine/types';
 import { toTeluguNumber } from '../utils/teluguNumbers';
@@ -28,8 +28,8 @@ interface HeaderProps {
   onToggleNumerals: () => void;
   selectedCity: CityOption;
   onOpenCityPicker: () => void;
-  activeTab: 'calendar' | 'day' | 'festivals' | 'muhurtam' | 'docs';
-  onSelectTab: (tab: 'calendar' | 'day' | 'festivals' | 'muhurtam' | 'docs') => void;
+  activeTab: 'calendar' | 'day' | 'festivals' | 'muhurtam' | 'reminders' | 'docs';
+  onSelectTab: (tab: 'calendar' | 'day' | 'festivals' | 'muhurtam' | 'reminders' | 'docs') => void;
   onPrint: () => void;
   onDownloadApk: () => void;
   samvatsaraDisplay?: string;
@@ -68,7 +68,6 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const isTe = language === 'te';
   const monthName = isTe ? MONTH_NAMES_TE[currentMonth - 1] : MONTH_NAMES_EN[currentMonth - 1];
-  const yearDisplay = useTeluguNumerals ? toTeluguNumber(currentYear) : currentYear;
 
   return (
     <header className="bg-gradient-to-r from-red-950 via-slate-900 to-amber-950 border-b border-amber-900/40 text-slate-100 shadow-xl sticky top-0 z-40">
@@ -101,13 +100,13 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </button>
 
-          {/* Telugu Numerals Toggle */}
+          {/* Numerals Toggle */}
           <button
             onClick={onToggleNumerals}
             className="px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-colors"
-            title="Toggle Telugu / English Numerals"
+            title="Toggle between English General Numbers and Telugu Numerals"
           >
-            {useTeluguNumerals ? 'తెలుగు సంఖ్యలు (౨౦౨౭)' : 'English (2027)'}
+            {useTeluguNumerals ? 'తెలుగు సంఖ్యలు (౨౦౨౭)' : 'Numbers: 1 2 3 (2027)'}
           </button>
 
           {/* Language Toggle */}
@@ -146,7 +145,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center space-x-3 cursor-pointer" onClick={() => onSelectTab('calendar')}>
           <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-600 to-amber-600 p-0.5 shadow-lg shadow-red-950/50 flex items-center justify-center">
             <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-amber-400 font-heading text-xl">
-              ౨౭
+              27
             </div>
           </div>
           <div>
@@ -203,10 +202,10 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* View Tabs */}
-        <nav className="flex items-center space-x-1 bg-slate-950/60 p-1 rounded-xl border border-amber-900/30">
+        <nav className="flex items-center space-x-1 bg-slate-950/60 p-1 rounded-xl border border-amber-900/30 overflow-x-auto max-w-full">
           <button
             onClick={() => onSelectTab('calendar')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               activeTab === 'calendar'
                 ? 'bg-amber-600 text-slate-950 font-semibold shadow-md'
                 : 'text-slate-300 hover:text-amber-200 hover:bg-slate-900'
@@ -218,7 +217,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onSelectTab('day')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               activeTab === 'day'
                 ? 'bg-amber-600 text-slate-950 font-semibold shadow-md'
                 : 'text-slate-300 hover:text-amber-200 hover:bg-slate-900'
@@ -230,7 +229,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onSelectTab('festivals')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               activeTab === 'festivals'
                 ? 'bg-amber-600 text-slate-950 font-semibold shadow-md'
                 : 'text-slate-300 hover:text-amber-200 hover:bg-slate-900'
@@ -242,7 +241,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onSelectTab('muhurtam')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               activeTab === 'muhurtam'
                 ? 'bg-amber-600 text-slate-950 font-semibold shadow-md'
                 : 'text-slate-300 hover:text-amber-200 hover:bg-slate-900'
@@ -253,15 +252,27 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <button
+            onClick={() => onSelectTab('reminders')}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+              activeTab === 'reminders'
+                ? 'bg-amber-600 text-slate-950 font-semibold shadow-md'
+                : 'text-slate-300 hover:text-amber-200 hover:bg-slate-900'
+            }`}
+          >
+            <Bell className="w-3.5 h-3.5" />
+            <span className="font-telugu">{isTe ? 'రిమైండర్లు' : 'Reminders'}</span>
+          </button>
+
+          <button
             onClick={() => onSelectTab('docs')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               activeTab === 'docs'
                 ? 'bg-amber-600 text-slate-950 font-semibold shadow-md'
                 : 'text-slate-300 hover:text-amber-200 hover:bg-slate-900'
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span className="font-telugu">{isTe ? 'పంచాంగ సూత్రాలు' : 'Rules'}</span>
+            <span className="font-telugu">{isTe ? 'సూత్రాలు' : 'Rules'}</span>
           </button>
         </nav>
       </div>
