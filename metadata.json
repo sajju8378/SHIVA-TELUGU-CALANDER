@@ -1,0 +1,6 @@
+{
+  "name": "Telugu Panchangam 2027",
+  "description": "Authentic Telugu Hindu Panchangam and Calendar for 2027 with high-precision astronomical calculations, Amanta lunar system, Tithi, Nakshatra, Muhurtam, and Festivals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
