@@ -13,7 +13,6 @@ import {
   Bell,
 } from 'lucide-react';
 import { CityOption } from '../engine/types';
-import { toTeluguNumber } from '../utils/teluguNumbers';
 
 interface HeaderProps {
   currentYear: number;
@@ -24,8 +23,6 @@ interface HeaderProps {
   onYearChange: (year: number) => void;
   language: 'te' | 'en';
   onToggleLanguage: () => void;
-  useTeluguNumerals: boolean;
-  onToggleNumerals: () => void;
   selectedCity: CityOption;
   onOpenCityPicker: () => void;
   activeTab: 'calendar' | 'day' | 'festivals' | 'muhurtam' | 'reminders' | 'docs';
@@ -55,8 +52,6 @@ export const Header: React.FC<HeaderProps> = ({
   onYearChange,
   language,
   onToggleLanguage,
-  useTeluguNumerals,
-  onToggleNumerals,
   selectedCity,
   onOpenCityPicker,
   activeTab,
@@ -76,8 +71,8 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center space-x-2">
           <span className="text-amber-400 font-semibold">🕉️ శుభమస్తు</span>
           <span className="text-slate-400">|</span>
-          <span className="font-telugu">
-            {samvatsaraDisplay || 'శ్రీ ప్లవంగ నామ సంవత్సరం (2027)'}
+          <span className="font-telugu font-semibold">
+            {samvatsaraDisplay || `శ్రీ ప్లవంగ నామ సంవత్సరం (${currentYear})`}
           </span>
           {teluguMonthDisplay && (
             <>
@@ -87,26 +82,31 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          {/* Reminders Button right in Top Header */}
+          <button
+            onClick={() => onSelectTab('reminders')}
+            className={`flex items-center space-x-1.5 px-3 py-1 rounded-lg border text-xs font-bold transition-all ${
+              activeTab === 'reminders'
+                ? 'bg-amber-600 text-slate-950 border-amber-500 shadow-md ring-1 ring-amber-400'
+                : 'bg-amber-950/70 hover:bg-amber-900 border-amber-700/60 text-amber-200'
+            }`}
+            title="Open Reminders & Notes Section"
+          >
+            <Bell className="w-3.5 h-3.5 text-amber-400" />
+            <span>{isTe ? 'రిమైండర్లు' : 'Reminders'}</span>
+          </button>
+
           {/* Location Button */}
           <button
             onClick={onOpenCityPicker}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded bg-amber-950/60 hover:bg-amber-900/60 border border-amber-800/50 text-amber-200 transition-colors"
+            className="flex items-center space-x-1 px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-850 border border-slate-700 text-slate-200 transition-colors"
             title="Change City Location for accurate Sunrise/Kalam"
           >
             <MapPin className="w-3.5 h-3.5 text-amber-400" />
             <span className="font-telugu font-medium">
               {isTe ? selectedCity.nameTelugu.split(' ')[0] : selectedCity.nameEnglish.split(' ')[0]}
             </span>
-          </button>
-
-          {/* Numerals Toggle */}
-          <button
-            onClick={onToggleNumerals}
-            className="px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-colors"
-            title="Toggle between English General Numbers and Telugu Numerals"
-          >
-            {useTeluguNumerals ? 'తెలుగు సంఖ్యలు (౨౦౨౭)' : 'Numbers: 1 2 3 (2027)'}
           </button>
 
           {/* Language Toggle */}
@@ -144,7 +144,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* App Title */}
         <div className="flex items-center space-x-3 cursor-pointer" onClick={() => onSelectTab('calendar')}>
           <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-600 to-amber-600 p-0.5 shadow-lg shadow-red-950/50 flex items-center justify-center">
-            <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-amber-400 font-heading text-xl">
+            <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-amber-400 font-mono font-bold text-xl">
               27
             </div>
           </div>
@@ -158,7 +158,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Month & Year Navigation Bar */}
+        {/* Month & Year Navigation Bar - Standard English Universal Numbers */}
         <div className="flex items-center bg-slate-900/90 border border-amber-900/40 rounded-xl p-1.5 shadow-inner">
           <button
             onClick={onPrevMonth}
@@ -169,17 +169,17 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <div className="px-3 flex items-center space-x-2 text-center">
-            <span className="font-heading text-lg font-bold text-amber-200 min-w-28">
+            <span className="font-heading text-lg font-bold text-amber-200 min-w-24">
               {monthName}
             </span>
             <select
               value={currentYear}
               onChange={(e) => onYearChange(parseInt(e.target.value, 10))}
-              className="bg-transparent text-amber-300 font-serif-num font-bold text-lg cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500 rounded px-1"
+              className="bg-transparent text-amber-300 font-mono font-bold text-lg cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500 rounded px-1"
             >
               {[2024, 2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
                 <option key={y} value={y} className="bg-slate-900 text-slate-100">
-                  {useTeluguNumerals ? toTeluguNumber(y) : y}
+                  {y}
                 </option>
               ))}
             </select>
@@ -207,7 +207,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onSelectTab('calendar')}
             className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               activeTab === 'calendar'
-                ? 'bg-amber-600 text-slate-950 font-semibold shadow-md'
+                ? 'bg-amber-600 text-slate-950 font-bold shadow-md'
                 : 'text-slate-300 hover:text-amber-200 hover:bg-slate-900'
             }`}
           >
@@ -216,10 +216,22 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <button
+            onClick={() => onSelectTab('reminders')}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
+              activeTab === 'reminders'
+                ? 'bg-amber-600 text-slate-950 font-extrabold shadow-md ring-1 ring-amber-400'
+                : 'text-amber-300 hover:text-amber-100 hover:bg-slate-900 bg-amber-950/30'
+            }`}
+          >
+            <Bell className="w-3.5 h-3.5 text-amber-400" />
+            <span className="font-telugu">{isTe ? 'రిమైండర్లు (Reminders)' : 'Reminders'}</span>
+          </button>
+
+          <button
             onClick={() => onSelectTab('day')}
             className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               activeTab === 'day'
-                ? 'bg-amber-600 text-slate-950 font-semibold shadow-md'
+                ? 'bg-amber-600 text-slate-950 font-bold shadow-md'
                 : 'text-slate-300 hover:text-amber-200 hover:bg-slate-900'
             }`}
           >
@@ -231,7 +243,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onSelectTab('festivals')}
             className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               activeTab === 'festivals'
-                ? 'bg-amber-600 text-slate-950 font-semibold shadow-md'
+                ? 'bg-amber-600 text-slate-950 font-bold shadow-md'
                 : 'text-slate-300 hover:text-amber-200 hover:bg-slate-900'
             }`}
           >
@@ -243,7 +255,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onSelectTab('muhurtam')}
             className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               activeTab === 'muhurtam'
-                ? 'bg-amber-600 text-slate-950 font-semibold shadow-md'
+                ? 'bg-amber-600 text-slate-950 font-bold shadow-md'
                 : 'text-slate-300 hover:text-amber-200 hover:bg-slate-900'
             }`}
           >
@@ -252,22 +264,10 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <button
-            onClick={() => onSelectTab('reminders')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-              activeTab === 'reminders'
-                ? 'bg-amber-600 text-slate-950 font-semibold shadow-md'
-                : 'text-slate-300 hover:text-amber-200 hover:bg-slate-900'
-            }`}
-          >
-            <Bell className="w-3.5 h-3.5" />
-            <span className="font-telugu">{isTe ? 'రిమైండర్లు' : 'Reminders'}</span>
-          </button>
-
-          <button
             onClick={() => onSelectTab('docs')}
             className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               activeTab === 'docs'
-                ? 'bg-amber-600 text-slate-950 font-semibold shadow-md'
+                ? 'bg-amber-600 text-slate-950 font-bold shadow-md'
                 : 'text-slate-300 hover:text-amber-200 hover:bg-slate-900'
             }`}
           >

@@ -45,13 +45,13 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
   const [copiedText, setCopiedText] = useState(false);
   const [selectedJanmaNakshatra, setSelectedJanmaNakshatra] = useState<number>(1); // Default Ashwini
 
-  // Format date display (general English numbers by default)
+  // Format date display in universal English numbers
   const dateParts = day.date.split('-');
   const y = parseInt(dateParts[0], 10);
   const m = parseInt(dateParts[1], 10);
   const d = parseInt(dateParts[2], 10);
 
-  const displayDateStr = `${useTeluguNumerals ? toTeluguNumber(d) : d}-${useTeluguNumerals ? toTeluguNumber(m) : m}-${useTeluguNumerals ? toTeluguNumber(y) : y}`;
+  const displayDateStr = `${d}-${m}-${y}`;
 
   const sankalpa = generateSankalpam(day);
   const userTara = calculateTarabalam(selectedJanmaNakshatra, day.nakshatra.number);

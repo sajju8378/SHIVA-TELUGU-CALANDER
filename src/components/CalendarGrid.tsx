@@ -1,6 +1,5 @@
 import React from 'react';
 import { PanchangamDay } from '../engine/types';
-import { toTeluguNumber } from '../utils/teluguNumbers';
 import { Sparkles, Sun, Moon, Bell } from 'lucide-react';
 import { getRemindersForDate } from '../engine/reminders';
 
@@ -11,7 +10,6 @@ interface CalendarGridProps {
   selectedDate: string;
   onSelectDate: (date: string) => void;
   language: 'te' | 'en';
-  useTeluguNumerals: boolean;
 }
 
 const WEEKDAYS_TE = ['ఆదివారం', 'సోమవారం', 'మంగళవారం', 'బుధవారం', 'గురువారం', 'శుక్రవారం', 'శనివారం'];
@@ -26,7 +24,6 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   selectedDate,
   onSelectDate,
   language,
-  useTeluguNumerals,
 }) => {
   const isTe = language === 'te';
 
@@ -75,6 +72,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             const hasFestival = day.festivals && day.festivals.length > 0;
             const isPournami = day.isPournami;
             const isAmavasya = day.isAmavasya;
+            const isSankashtaChaturthi = day.tithi.number === 19;
             const dayReminders = getRemindersForDate(day.date);
             const hasReminders = dayReminders.length > 0;
 
@@ -97,12 +95,12 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                     : 'bg-slate-900/70 hover:bg-slate-800/80'
                 }`}
               >
-                {/* Top Row: Date Number (Left) & Special Badges (Right) */}
+                {/* Top Row: UNIVERSAL ENGLISH DIGITS (1, 2, 3...) & Badges */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-1.5">
-                    {/* English / General Numbers */}
+                    {/* Standard Universal English Digits */}
                     <span
-                      className={`text-base md:text-xl font-bold font-serif-num ${
+                      className={`text-base md:text-xl font-bold font-mono ${
                         isSunday
                           ? 'text-red-400'
                           : isToday
@@ -110,22 +108,31 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                           : 'text-slate-100'
                       }`}
                     >
-                      {useTeluguNumerals ? toTeluguNumber(dayNum) : dayNum}
+                      {dayNum}
                     </span>
                     {isToday && (
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
                     )}
                   </div>
 
-                  {/* Special Markers: Reminders, Pournami, Amavasya */}
+                  {/* Special Markers: Reminders, Sankashta Chaturthi, Pournami, Amavasya */}
                   <div className="flex items-center space-x-1">
                     {hasReminders && (
                       <span
-                        className="inline-flex items-center text-[10px] text-amber-400 bg-amber-950/70 border border-amber-500/50 rounded-full px-1 py-0.2"
+                        className="inline-flex items-center text-[10px] text-amber-300 bg-amber-950/80 border border-amber-500/60 rounded-full px-1.5 py-0.2 font-mono font-bold shadow"
                         title={`${dayReminders.length} reminder(s)`}
                       >
                         <Bell className="w-2.5 h-2.5 mr-0.5" />
                         <span>{dayReminders.length}</span>
+                      </span>
+                    )}
+
+                    {isSankashtaChaturthi && (
+                      <span
+                        className="inline-flex items-center text-[10px] px-1 py-0.2 rounded bg-amber-900/80 text-amber-200 border border-amber-500/50"
+                        title="సంకష్టహర చతుర్థి (Sankashta Chaturthi)"
+                      >
+                        🐘
                       </span>
                     )}
 
@@ -160,9 +167,17 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
 
                 {/* Bottom Row: Festival indicator or Sunrise */}
                 <div className="mt-auto">
-                  {hasFestival ? (
+                  {isSankashtaChaturthi ? (
                     <div
-                      className="bg-amber-600/30 border border-amber-500/50 rounded px-1.5 py-0.5 text-[10px] md:text-xs text-amber-200 font-medium truncate flex items-center space-x-1"
+                      className="bg-amber-600/40 border border-amber-500/60 rounded px-1.5 py-0.5 text-[10px] md:text-xs text-amber-100 font-semibold truncate flex items-center space-x-1"
+                      title="సంకష్టహర చతుర్థి (చంద్రోదయ పూజ)"
+                    >
+                      <span>🐘</span>
+                      <span className="truncate font-telugu">సంకష్టహర చవితి</span>
+                    </div>
+                  ) : hasFestival ? (
+                    <div
+                      className="bg-red-600/30 border border-red-500/50 rounded px-1.5 py-0.5 text-[10px] md:text-xs text-amber-200 font-medium truncate flex items-center space-x-1"
                       title={day.festivals.map((f) => (isTe ? f.nameTelugu : f.nameEnglish)).join(', ')}
                     >
                       <Sparkles className="w-2.5 h-2.5 text-amber-300 shrink-0" />
@@ -171,7 +186,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                       </span>
                     </div>
                   ) : (
-                    <div className="text-[9px] md:text-[10px] text-slate-500 flex items-center justify-between">
+                    <div className="text-[9px] md:text-[10px] text-slate-500 flex items-center justify-between font-mono">
                       <span className="flex items-center space-x-0.5">
                         <Sun className="w-2.5 h-2.5 text-amber-500/70" />
                         <span>{day.sunrise.formatted12}</span>

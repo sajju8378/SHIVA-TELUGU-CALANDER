@@ -12,16 +12,16 @@ import { DocsView } from './components/DocsView';
 import { PrintCalendar } from './components/PrintCalendar';
 import { DateConverterModal } from './components/DateConverterModal';
 import { AllRemindersView } from './components/AllRemindersView';
-import { Sun, Smartphone, MapPin, ArrowRightLeft, Bell, Calendar as CalendarIcon } from 'lucide-react';
-import { toTeluguNumber } from './utils/teluguNumbers';
+import { SankashtaChaturthiSection } from './components/SankashtaChaturthiSection';
+import { Sun, Smartphone, MapPin, ArrowRightLeft, Bell, Calendar as CalendarIcon, Sparkles } from 'lucide-react';
+import { loadAllReminders } from './engine/reminders';
 
 export default function App() {
-  // Navigation & Settings State - General English numbers by default!
+  // Navigation & Settings State - Pure Universal English Numbers (1, 2, 3... 31 & 2027)!
   const [currentYear, setCurrentYear] = useState<number>(2027);
   const [currentMonth, setCurrentMonth] = useState<number>(4); // Default to April 2027 (Ugadi month!)
   const [selectedDate, setSelectedDate] = useState<string>('2027-04-07'); // Default to Ugadi 2027!
   const [language, setLanguage] = useState<'te' | 'en'>('te');
-  const [useTeluguNumerals, setUseTeluguNumerals] = useState<boolean>(false); // DEFAULT: English General Numbers!
   const [selectedCity, setSelectedCity] = useState<CityOption>(TELUGU_CITIES[0]); // Default Hyderabad
   const [activeTab, setActiveTab] = useState<'calendar' | 'day' | 'festivals' | 'muhurtam' | 'reminders' | 'docs'>('calendar');
 
@@ -30,6 +30,14 @@ export default function App() {
   const [isCityModalOpen, setIsCityModalOpen] = useState<boolean>(false);
   const [isApkModalOpen, setIsApkModalOpen] = useState<boolean>(false);
   const [isConverterOpen, setIsConverterOpen] = useState<boolean>(false);
+
+  // Reminders count for quick badge
+  const [remindersCount, setRemindersCount] = useState<number>(0);
+
+  useEffect(() => {
+    const list = loadAllReminders();
+    setRemindersCount(list.length);
+  }, [activeTab, isDayModalOpen]);
 
   // Month Days Data
   const monthDays = useMemo(() => {
@@ -173,8 +181,6 @@ export default function App() {
         onYearChange={setCurrentYear}
         language={language}
         onToggleLanguage={() => setLanguage((l) => (l === 'te' ? 'en' : 'te'))}
-        useTeluguNumerals={useTeluguNumerals}
-        onToggleNumerals={() => setUseTeluguNumerals((v) => !v)}
         selectedCity={selectedCity}
         onOpenCityPicker={() => setIsCityModalOpen(true)}
         activeTab={activeTab}
@@ -191,11 +197,11 @@ export default function App() {
         {firstDay && (
           <div className="bg-gradient-to-r from-red-950/40 via-slate-900 to-amber-950/40 border border-amber-900/40 rounded-2xl p-4 shadow-lg flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm font-telugu">
             <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300">
                 <Sun className="w-5 h-5 text-amber-400" />
               </div>
               <div>
-                <div className="font-bold text-amber-200">
+                <div className="font-bold text-amber-200 text-sm md:text-base">
                   {firstDay.samvatsaraTelugu} నామ సంవత్సరం • {firstDay.monthTelugu}
                 </div>
                 <div className="text-xs text-slate-400">
@@ -205,25 +211,30 @@ export default function App() {
             </div>
 
             {/* Quick Actions Bar */}
-            <div className="flex flex-wrap items-center gap-2 text-xs text-amber-300/80">
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              {/* Reminders Button with count */}
+              <button
+                onClick={() => setActiveTab('reminders')}
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold shadow-md transition-all cursor-pointer"
+                title="Manage All Saved Reminders & Notes"
+              >
+                <Bell className="w-3.5 h-3.5" />
+                <span>{isTe ? 'నా రిమైండర్లు' : 'My Reminders'}</span>
+                {remindersCount > 0 && (
+                  <span className="ml-1 px-1.5 py-0.2 rounded-full bg-slate-950 text-amber-300 text-[10px] font-mono">
+                    {remindersCount}
+                  </span>
+                )}
+              </button>
+
               {/* Date Converter Tool Button */}
               <button
                 onClick={() => setIsConverterOpen(true)}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-950/60 border border-amber-800/50 hover:bg-amber-900/60 text-amber-300 transition-colors"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-amber-800/50 hover:bg-slate-850 text-amber-300 transition-colors cursor-pointer"
                 title="Convert English Date to Telugu Date"
               >
                 <ArrowRightLeft className="w-3.5 h-3.5 text-amber-400" />
                 <span>{isTe ? 'తేదీ మార్పిడి / శోధన' : 'Date Converter'}</span>
-              </button>
-
-              {/* Reminders Quick Jump Button */}
-              <button
-                onClick={() => setActiveTab('reminders')}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-950/60 border border-amber-800/50 hover:bg-amber-900/60 text-amber-300 transition-colors"
-                title="Manage All Reminders"
-              >
-                <Bell className="w-3.5 h-3.5 text-amber-400" />
-                <span>{isTe ? 'రిమైండర్లు' : 'Reminders'}</span>
               </button>
 
               {/* Location Picker */}
@@ -247,17 +258,27 @@ export default function App() {
           </div>
         )}
 
-        {/* Tab Views */}
+        {/* TAB 1: MAIN SECTION - CALENDAR + SANKASHTA CHATURTHI DATES */}
         {activeTab === 'calendar' && (
-          <CalendarGrid
-            days={monthDays}
-            currentYear={currentYear}
-            currentMonth={currentMonth}
-            selectedDate={selectedDate}
-            onSelectDate={handleSelectDate}
-            language={language}
-            useTeluguNumerals={useTeluguNumerals}
-          />
+          <div className="space-y-6">
+            {/* FEATURED: SANKASHTA CHATURTHI DATES SECTION RIGHT IN MAIN SECTION! */}
+            <SankashtaChaturthiSection
+              currentYear={currentYear}
+              cityName={selectedCity.nameTelugu}
+              onSelectDate={handleSelectDate}
+              language={language}
+            />
+
+            {/* Standard Calendar Grid (English 1, 2, 3 Universal Digits) */}
+            <CalendarGrid
+              days={monthDays}
+              currentYear={currentYear}
+              currentMonth={currentMonth}
+              selectedDate={selectedDate}
+              onSelectDate={handleSelectDate}
+              language={language}
+            />
+          </div>
         )}
 
         {activeTab === 'day' && (
@@ -268,7 +289,7 @@ export default function App() {
               onPrevDay={handlePrevDay}
               onNextDay={handleNextDay}
               language={language}
-              useTeluguNumerals={useTeluguNumerals}
+              useTeluguNumerals={false}
             />
           </div>
         )}
@@ -279,7 +300,7 @@ export default function App() {
             currentYear={currentYear}
             onSelectDate={handleSelectDate}
             language={language}
-            useTeluguNumerals={useTeluguNumerals}
+            useTeluguNumerals={false}
           />
         )}
 
@@ -288,10 +309,11 @@ export default function App() {
             day={selectedDayData}
             onSelectDate={setSelectedDate}
             language={language}
-            useTeluguNumerals={useTeluguNumerals}
+            useTeluguNumerals={false}
           />
         )}
 
+        {/* DEDICATED REMINDERS SECTION */}
         {activeTab === 'reminders' && (
           <AllRemindersView
             onSelectDate={handleSelectDate}
@@ -302,13 +324,28 @@ export default function App() {
         {activeTab === 'docs' && <DocsView language={language} />}
       </main>
 
+      {/* Floating Shortcut Button to Reminders */}
+      <button
+        onClick={() => setActiveTab('reminders')}
+        className="fixed bottom-6 right-6 z-30 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold px-4 py-2.5 rounded-full shadow-2xl flex items-center space-x-2 border-2 border-amber-300 transition-all transform hover:scale-105 cursor-pointer no-print"
+        title="Open Reminders"
+      >
+        <Bell className="w-4 h-4 fill-slate-950" />
+        <span className="font-telugu text-xs">{isTe ? 'రిమైండర్లు' : 'Reminders'}</span>
+        {remindersCount > 0 && (
+          <span className="w-5 h-5 rounded-full bg-red-700 text-white text-[11px] font-mono flex items-center justify-center font-bold">
+            {remindersCount}
+          </span>
+        )}
+      </button>
+
       {/* Printable Wall Calendar View (only shown when printing) */}
       <PrintCalendar
         days={monthDays}
         currentYear={currentYear}
         currentMonth={currentMonth}
         cityName={selectedCity.nameTelugu}
-        useTeluguNumerals={useTeluguNumerals}
+        useTeluguNumerals={false}
         language={language}
       />
 
@@ -320,7 +357,7 @@ export default function App() {
           onPrevDay={handlePrevDay}
           onNextDay={handleNextDay}
           language={language}
-          useTeluguNumerals={useTeluguNumerals}
+          useTeluguNumerals={false}
         />
       )}
 
