@@ -6,6 +6,8 @@ console.log('Running postbuild for GitHub Pages & standalone deployment...');
 const rootDir = process.cwd();
 const distDir = path.join(rootDir, 'dist');
 const docsDir = path.join(rootDir, 'docs');
+const assetsDir = path.join(rootDir, 'assets');
+const downloadsDir = path.join(rootDir, 'downloads');
 
 function copyRecursive(src: string, dest: string) {
   if (!fs.existsSync(src)) return;
@@ -20,14 +22,30 @@ function copyRecursive(src: string, dest: string) {
   }
 }
 
-// 1. Copy dist to docs
+// 1. Copy dist/assets to root assets and docs/assets
+if (fs.existsSync(path.join(distDir, 'assets'))) {
+  copyRecursive(path.join(distDir, 'assets'), assetsDir);
+  copyRecursive(path.join(distDir, 'assets'), path.join(docsDir, 'assets'));
+}
+
+// 2. Ensure docs folder has complete static site
 copyRecursive(distDir, docsDir);
+if (fs.existsSync(path.join(rootDir, 'index.html'))) {
+  fs.copyFileSync(path.join(rootDir, 'index.html'), path.join(docsDir, 'index.html'));
+}
 
-// 2. Copy dist/assets to root assets
-copyRecursive(path.join(distDir, 'assets'), path.join(rootDir, 'assets'));
+// 3. Ensure downloads are synchronized across downloads, docs/downloads, public/downloads
+const apkName = 'telugu-panchangam-2027.apk';
+const apkSource = path.join(downloadsDir, apkName);
+if (fs.existsSync(apkSource)) {
+  const docsDownloads = path.join(docsDir, 'downloads');
+  if (!fs.existsSync(docsDownloads)) fs.mkdirSync(docsDownloads, { recursive: true });
+  fs.copyFileSync(apkSource, path.join(docsDownloads, apkName));
 
-// 3. Copy dist/downloads to root downloads
-copyRecursive(path.join(distDir, 'downloads'), path.join(rootDir, 'downloads'));
+  const publicDownloads = path.join(rootDir, 'public', 'downloads');
+  if (!fs.existsSync(publicDownloads)) fs.mkdirSync(publicDownloads, { recursive: true });
+  fs.copyFileSync(apkSource, path.join(publicDownloads, apkName));
+}
 
 // 4. Create .nojekyll in root, dist, and docs
 fs.writeFileSync(path.join(rootDir, '.nojekyll'), '', 'utf-8');
@@ -41,7 +59,6 @@ const notFoundHtml = `<!DOCTYPE html>
     <meta charset="utf-8">
     <title>Telugu Panchangam 2027</title>
     <script>
-      // Single Page App redirect for GitHub Pages
       sessionStorage.redirect = location.href;
       location.replace('./');
     </script>
@@ -55,4 +72,4 @@ fs.writeFileSync(path.join(rootDir, '404.html'), notFoundHtml, 'utf-8');
 fs.writeFileSync(path.join(distDir, '404.html'), notFoundHtml, 'utf-8');
 fs.writeFileSync(path.join(docsDir, '404.html'), notFoundHtml, 'utf-8');
 
-console.log('Postbuild finished successfully! Ready for GitHub Pages (both root and docs folder).');
+console.log('Postbuild finished successfully! Root & docs synchronized.');
