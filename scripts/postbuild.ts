@@ -72,4 +72,11 @@ fs.writeFileSync(path.join(rootDir, '404.html'), notFoundHtml, 'utf-8');
 fs.writeFileSync(path.join(distDir, '404.html'), notFoundHtml, 'utf-8');
 fs.writeFileSync(path.join(docsDir, '404.html'), notFoundHtml, 'utf-8');
 
+// 6. Ensure ads.txt is in dist and docs
+const adsTxtSource = path.join(rootDir, 'ads.txt');
+if (fs.existsSync(adsTxtSource)) {
+  fs.copyFileSync(adsTxtSource, path.join(distDir, 'ads.txt'));
+  fs.copyFileSync(adsTxtSource, path.join(docsDir, 'ads.txt'));
+}
+
 console.log('Postbuild finished successfully! Root & docs synchronized.');
