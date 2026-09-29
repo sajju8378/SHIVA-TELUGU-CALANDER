@@ -1,5 +1,5 @@
-import React from 'react';
-import { Smartphone, Download, CheckCircle, ShieldCheck, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Smartphone, Download, ShieldCheck, Check, X, AlertCircle } from 'lucide-react';
 
 interface ApkDownloadBannerProps {
   isOpen: boolean;
@@ -14,9 +14,20 @@ export const ApkDownloadBanner: React.FC<ApkDownloadBannerProps> = ({
 }) => {
   if (!isOpen) return null;
   const isTe = language === 'te';
+  const [downloadTriggered, setDownloadTriggered] = useState(false);
 
   const handleDownload = () => {
-    window.location.href = '/download/telugu-panchangam-2027.apk';
+    setDownloadTriggered(true);
+
+    // Try downloading the static asset with relative path
+    const link = document.createElement('a');
+    link.href = './downloads/telugu-panchangam-2027.apk';
+    link.download = 'TeluguPanchangam2027.apk';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setTimeout(() => setDownloadTriggered(false), 3000);
   };
 
   return (
@@ -38,7 +49,7 @@ export const ApkDownloadBanner: React.FC<ApkDownloadBannerProps> = ({
         </div>
 
         <div className="p-5 space-y-4 text-xs md:text-sm text-slate-200">
-          <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-800/50 flex items-start space-x-3">
+          <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-800/60 flex items-start space-x-3">
             <ShieldCheck className="w-6 h-6 text-emerald-400 shrink-0 mt-0.5" />
             <div>
               <div className="font-bold text-emerald-300 text-sm">
@@ -46,15 +57,15 @@ export const ApkDownloadBanner: React.FC<ApkDownloadBannerProps> = ({
               </div>
               <p className="text-xs text-slate-300 mt-1">
                 {isTe
-                  ? 'ఇంటర్నెట్ లేకపోయినా పనిచేసేలా 2027 పూర్తి పంచాంగ సమాచారంతో రూపొందించబడిన పూర్తి ఆఫ్‌లైన్ యాప్.'
-                  : 'Standalone offline Android package pre-bundled with complete 2027 Panchangam calculations.'}
+                  ? 'పూర్తిగా ఆఫ్‌లైన్‌లో పనిచేసేలా రూపొందించబడిన స్వతంత్ర ఆండ్రాయిడ్ అప్లికేషన్ ప్యాకేజీ (APK). ఇంటర్నెట్ లేకపోయినా 2027 పంచాంగం లభిస్తుంది.'
+                  : 'Standalone offline Android package pre-bundled with complete 2027 astronomical Panchangam calculations.'}
               </p>
             </div>
           </div>
 
           <div className="space-y-2">
             <h4 className="font-bold text-amber-300 text-xs uppercase tracking-wider">
-              {isTe ? 'ఇన్‌స్టాలేషన్ విధానం:' : 'Installation Steps:'}
+              {isTe ? 'ఇన్‌స్టాలేషన్ విధానం:' : 'Installation Instructions:'}
             </h4>
             <ol className="list-decimal list-inside space-y-1.5 text-xs text-slate-300">
               <li>
@@ -64,18 +75,18 @@ export const ApkDownloadBanner: React.FC<ApkDownloadBannerProps> = ({
               </li>
               <li>
                 {isTe
-                  ? 'డౌన్‌లోడ్ పూర్తయిన తర్వాత ఫైల్‌ను ఓపెన్ చేసి "Install" ఎంచుకోండి.'
-                  : 'Open the downloaded file on your Android device and tap Install.'}
+                  ? 'డౌన్‌లోడ్ పూర్తయిన తర్వాత మీ ఫోన్ Notifications లేదా Files లో ఫైల్‌ను ఓపెన్ చేయండి.'
+                  : 'Open the downloaded file in your phone notifications or Files app.'}
               </li>
               <li>
                 {isTe
-                  ? 'ఒకవేళ "Unknown Sources" ప్రాంప్ట్ వస్తే అనుమతించండి.'
-                  : 'Allow installation from this source if prompted by Android.'}
+                  ? 'ఒకవేళ "Install unknown apps" అనుమతి అడిగితే Enable చేయండి.'
+                  : 'Enable "Install from this source / Unknown apps" permission if prompted.'}
               </li>
               <li>
                 {isTe
-                  ? 'ప్రత్యామ్నాయంగా, Chrome బ్రౌజర్‌లో "Add to Home Screen" ద్వారా కూడా యాప్‌గా ఇన్‌స్టాల్ చేసుకోవచ్చు!'
-                  : 'Alternatively, install instantly via Chrome menu: "Add to Home screen / Install app"!'}
+                  ? 'వెంటనే మీ హోమ్ స్క్రీన్‌పై తెలుగు పంచాంగం 2027 యాప్ సిద్ధమవుతుంది!'
+                  : 'The Telugu Panchangam 2027 app icon will appear on your home screen!'}
               </li>
             </ol>
           </div>
@@ -85,8 +96,12 @@ export const ApkDownloadBanner: React.FC<ApkDownloadBannerProps> = ({
               onClick={handleDownload}
               className="flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-950/50 transition-all cursor-pointer"
             >
-              <Download className="w-4 h-4" />
-              <span>{isTe ? 'APK డౌన్‌లోడ్ చేయండి (.apk)' : 'Download APK File (.apk)'}</span>
+              {downloadTriggered ? <Check className="w-4 h-4" /> : <Download className="w-4 h-4" />}
+              <span>
+                {downloadTriggered
+                  ? (isTe ? 'డౌన్‌లోడ్ ప్రారంభమైంది...' : 'Download Started...')
+                  : (isTe ? 'APK డౌన్‌లోడ్ చేయండి (.apk)' : 'Download APK File (.apk)')}
+              </span>
             </button>
             <button
               onClick={onClose}
@@ -94,6 +109,18 @@ export const ApkDownloadBanner: React.FC<ApkDownloadBannerProps> = ({
             >
               {isTe ? 'మూసివేయి' : 'Close'}
             </button>
+          </div>
+
+          {/* Direct Link Fallback */}
+          <div className="text-center pt-1 text-[11px] text-slate-400">
+            {isTe ? 'డౌన్‌లోడ్ కాకపోతే:' : 'If direct download does not start:'}{' '}
+            <a
+              href="./downloads/telugu-panchangam-2027.apk"
+              download="TeluguPanchangam2027.apk"
+              className="text-amber-400 underline hover:text-amber-300 font-semibold"
+            >
+              {isTe ? 'ఇక్కడ నొక్కి నేరుగా సేవ్ చేయండి' : 'Click here to save directly'}
+            </a>
           </div>
         </div>
       </div>

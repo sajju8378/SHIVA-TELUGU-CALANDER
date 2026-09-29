@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { CityOption, FestivalItem, PanchangamDay } from './engine/types';
 import { calculatePanchangamForDay, TELUGU_CITIES } from './engine/panchangam';
-import { FESTIVAL_DEFINITIONS, getFestivalsForDay } from './engine/festivals';
 import { Header } from './components/Header';
 import { CalendarGrid } from './components/CalendarGrid';
 import { DayDetailModal } from './components/DayDetailModal';
@@ -11,7 +10,8 @@ import { LocationModal } from './components/LocationModal';
 import { ApkDownloadBanner } from './components/ApkDownloadBanner';
 import { DocsView } from './components/DocsView';
 import { PrintCalendar } from './components/PrintCalendar';
-import { Sun, Moon, Calendar as CalendarIcon, Sparkles, Smartphone, Download, MapPin } from 'lucide-react';
+import { DateConverterModal } from './components/DateConverterModal';
+import { Sun, Sparkles, Smartphone, MapPin, ArrowRightLeft, Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { toTeluguNumber } from './utils/teluguNumbers';
 
 export default function App() {
@@ -28,6 +28,7 @@ export default function App() {
   const [isDayModalOpen, setIsDayModalOpen] = useState<boolean>(false);
   const [isCityModalOpen, setIsCityModalOpen] = useState<boolean>(false);
   const [isApkModalOpen, setIsApkModalOpen] = useState<boolean>(false);
+  const [isConverterOpen, setIsConverterOpen] = useState<boolean>(false);
 
   // Month Days Data
   const monthDays = useMemo(() => {
@@ -202,8 +203,19 @@ export default function App() {
               </div>
             </div>
 
-            {/* Quick Actions & Location */}
-            <div className="flex items-center space-x-2 text-xs text-amber-300/80">
+            {/* Quick Actions Bar */}
+            <div className="flex flex-wrap items-center gap-2 text-xs text-amber-300/80">
+              {/* Date Converter Tool Button */}
+              <button
+                onClick={() => setIsConverterOpen(true)}
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-950/60 border border-amber-800/50 hover:bg-amber-900/60 text-amber-300 transition-colors"
+                title="Convert English Date to Telugu Date"
+              >
+                <ArrowRightLeft className="w-3.5 h-3.5 text-amber-400" />
+                <span>{isTe ? 'తేదీ మార్పిడి / శోధన' : 'Date Converter'}</span>
+              </button>
+
+              {/* Location Picker */}
               <button
                 onClick={() => setIsCityModalOpen(true)}
                 className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-900 border border-amber-900/40 hover:bg-slate-850 hover:border-amber-700/60 transition-colors"
@@ -212,9 +224,10 @@ export default function App() {
                 <span>{selectedCity.nameTelugu}</span>
               </button>
 
+              {/* Direct APK Download Button */}
               <button
                 onClick={() => setIsApkModalOpen(true)}
-                className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-700/50 text-emerald-300 hover:bg-emerald-900 transition-colors font-semibold"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-700/50 text-emerald-300 hover:bg-emerald-900 transition-colors font-semibold"
               >
                 <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{isTe ? 'APK డౌన్‌లోడ్' : 'Download APK'}</span>
@@ -293,6 +306,14 @@ export default function App() {
         />
       )}
 
+      {/* Date Converter Modal */}
+      <DateConverterModal
+        isOpen={isConverterOpen}
+        onClose={() => setIsConverterOpen(false)}
+        onSelectDate={handleSelectDate}
+        language={language}
+      />
+
       {/* Location Picker Modal */}
       {isCityModalOpen && (
         <LocationModal
@@ -321,6 +342,14 @@ export default function App() {
           </div>
 
           <div className="flex items-center space-x-4 text-slate-400">
+            <button
+              onClick={() => setIsConverterOpen(true)}
+              className="hover:text-amber-300 transition-colors flex items-center space-x-1"
+            >
+              <ArrowRightLeft className="w-3.5 h-3.5" />
+              <span>{isTe ? 'తేదీ మార్పిడి' : 'Date Converter'}</span>
+            </button>
+            <span>·</span>
             <button
               onClick={() => setActiveTab('docs')}
               className="hover:text-amber-300 transition-colors"

@@ -17,17 +17,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Noto+Sans+Telugu:wght@300;400;500;600;700;800&family=Ramabhadra&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="./assets/index.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index.css">
   </head>
   <body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-amber-500 selection:text-slate-950">
     <div id="root"></div>
-    <script type="module">
-      if (window.__vite_plugin_react_preamble_installed__ || (location.port === '3000' && !location.hostname.includes('github.io'))) {
-        import('./src/main.tsx');
-      } else {
-        import('./assets/index.js');
-      }
-    </script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
