@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build && tsx scripts/postbuild.ts",
-    "build:apk": "python3 scripts/build_apk.py",
     "start": "tsx server.ts",
     "preview": "vite preview",
     "test": "tsx test/panchangam.test.ts",

@@ -50,13 +50,16 @@ jobs:
       - name: Collect Built APK
         run: |
           mkdir -p build-output
-          APK_FILE=$(find android/app/build/outputs/apk/debug -name "*.apk" | head -n 1)
+          APK_FILE=$(find android/app/build/outputs/apk/debug -name "*.apk" 2>/dev/null | head -n 1)
+          if [ -z "$APK_FILE" ]; then
+            APK_FILE=$(find android -name "*.apk" 2>/dev/null | head -n 1)
+          fi
+          echo "Found APK: $APK_FILE"
           if [ -n "$APK_FILE" ] && [ -f "$APK_FILE" ]; then
-            echo "Successfully found built APK at: $APK_FILE"
             cp "$APK_FILE" build-output/Telugu-Panchangam-2027.apk
-            ls -lh build-output/
+            ls -lh build-output/Telugu-Panchangam-2027.apk
           else
-            echo "Error: APK was not produced in android/app/build/outputs/apk/debug"
+            echo "Error: APK not found"
             exit 1
           fi
 
