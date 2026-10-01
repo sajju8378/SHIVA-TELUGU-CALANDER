@@ -24,7 +24,7 @@
     <script type="module">
       const isGitHubPages = window.location.hostname.endsWith('github.io');
       if (isGitHubPages) {
-        // Automatically inject compiled CSS and JS if deployed from root
+        // Automatically inject compiled CSS and JS if deployed on GitHub Pages root
         const css = document.createElement('link');
         css.rel = 'stylesheet';
         css.crossOrigin = 'anonymous';
@@ -37,17 +37,32 @@
         js.src = './docs/assets/index-DYZHctKy.js';
         document.body.appendChild(js);
       } else {
-        // Standard Vite dev mode for AI Studio & local dev server
+        // Standard Vite entry for AI Studio and development
         import('/src/main.tsx');
       }
     </script>
+
     <script>
+      // Clear service workers and caches immediately in AI Studio / development environments
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(err => {
-            console.log('SW registration note:', err);
+        if (window.location.hostname.includes('run.app') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for (let r of registrations) {
+              r.unregister();
+            }
           });
-        });
+          if ('caches' in window) {
+            caches.keys().then(function(names) {
+              for (let name of names) caches.delete(name);
+            });
+          }
+        } else {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(err => {
+              console.log('SW registration note:', err);
+            });
+          });
+        }
       }
     </script>
   </body>

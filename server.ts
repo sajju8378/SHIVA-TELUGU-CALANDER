@@ -258,6 +258,25 @@ app.get('/download/telugu-panchangam-2027.apk', (_req, res) => {
 // Vite middleware in dev or static files in prod
 // -------------------------------------------------------------
 async function setupServer() {
+  // Explicit route for /assets/main.js to support AI Studio preview test harness
+  app.get('/assets/main.js', (req, res, next) => {
+    if (!isProd) {
+      req.url = '/src/main.tsx';
+      return next();
+    } else {
+      const distAssets = path.resolve(__dirname, 'dist/assets');
+      if (fs.existsSync(distAssets)) {
+        const files = fs.readdirSync(distAssets);
+        const match = files.find(f => (f.startsWith('main-') || f.startsWith('index-')) && f.endsWith('.js'));
+        if (match) {
+          res.setHeader('Content-Type', 'application/javascript');
+          return res.sendFile(path.join(distAssets, match));
+        }
+      }
+      return next();
+    }
+  });
+
   if (!isProd) {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({

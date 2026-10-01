@@ -68,4 +68,20 @@ if (fs.existsSync(adsTxtSource)) {
   if (fs.existsSync(docsDir)) fs.copyFileSync(adsTxtSource, path.join(docsDir, 'ads.txt'));
 }
 
+// 6. Provide /assets/main.js fallback alias in dist, docs, and root
+const distAssetsDir = path.join(distDir, 'assets');
+if (fs.existsSync(distAssetsDir)) {
+  const files = fs.readdirSync(distAssetsDir);
+  const mainCandidate = files.find(f => (f.startsWith('main-') || f.startsWith('index-')) && f.endsWith('.js'));
+  if (mainCandidate) {
+    fs.copyFileSync(path.join(distAssetsDir, mainCandidate), path.join(distAssetsDir, 'main.js'));
+    if (fs.existsSync(path.join(docsDir, 'assets'))) {
+      fs.copyFileSync(path.join(distAssetsDir, mainCandidate), path.join(docsDir, 'assets', 'main.js'));
+    }
+    if (fs.existsSync(rootAssetsDir)) {
+      fs.copyFileSync(path.join(distAssetsDir, mainCandidate), path.join(rootAssetsDir, 'main.js'));
+    }
+  }
+}
+
 console.log('Postbuild finished successfully!');

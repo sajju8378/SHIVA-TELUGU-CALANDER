@@ -22,13 +22,28 @@
   <body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-amber-500 selection:text-slate-950">
     <div id="root"></div>
 
+
     <script>
+      // Clear service workers and caches immediately in AI Studio / development environments
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(err => {
-            console.log('SW registration note:', err);
+        if (window.location.hostname.includes('run.app') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for (let r of registrations) {
+              r.unregister();
+            }
           });
-        });
+          if ('caches' in window) {
+            caches.keys().then(function(names) {
+              for (let name of names) caches.delete(name);
+            });
+          }
+        } else {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(err => {
+              console.log('SW registration note:', err);
+            });
+          });
+        }
       }
     </script>
   </body>
