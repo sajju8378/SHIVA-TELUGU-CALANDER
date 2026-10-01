@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig(() => {
   return {
-    base: './', // CRITICAL for GitHub Pages subpath deployment (/SHIVA-TELUGU-CALANDER/)
+    base: './', // Relative base for GitHub Pages root deployment
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
@@ -19,6 +19,16 @@ export default defineConfig(() => {
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
+      rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, 'index.dev.html'),
+        },
+        output: {
+          entryFileNames: 'assets/[name].js',
+          chunkFileNames: 'assets/[name].js',
+          assetFileNames: 'assets/[name].[ext]',
+        },
+      },
     },
     server: {
       port: 3000,

@@ -283,6 +283,18 @@ async function setupServer() {
       server: { middlewareMode: true },
       appType: 'spa',
     });
+
+    app.get(['/', '/index.html'], async (req, res, next) => {
+      try {
+        const templatePath = path.resolve(__dirname, 'index.dev.html');
+        let template = fs.readFileSync(templatePath, 'utf-8');
+        template = await vite.transformIndexHtml(req.originalUrl || '/', template);
+        return res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
+      } catch (e) {
+        next(e);
+      }
+    });
+
     app.use(vite.middlewares);
   } else {
     const distPath = path.resolve(__dirname, 'dist');
