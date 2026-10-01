@@ -31,7 +31,8 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   const firstDayOfWeek = days.length > 0 ? days[0].dayOfWeek : 0;
   const blankDays = Array.from({ length: firstDayOfWeek });
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
 
   return (
     <div className="w-full">

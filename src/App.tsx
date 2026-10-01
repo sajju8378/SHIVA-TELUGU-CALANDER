@@ -17,10 +17,16 @@ import { Sun, Smartphone, MapPin, ArrowRightLeft, Bell, Calendar as CalendarIcon
 import { loadAllReminders } from './engine/reminders';
 
 export default function App() {
-  // Navigation & Settings State - Pure Universal English Numbers (1, 2, 3... 31 & 2027)!
-  const [currentYear, setCurrentYear] = useState<number>(2027);
-  const [currentMonth, setCurrentMonth] = useState<number>(4); // Default to April 2027 (Ugadi month!)
-  const [selectedDate, setSelectedDate] = useState<string>('2027-04-07'); // Default to Ugadi 2027!
+  // Navigation & Settings State - Pure Universal English Numbers
+  const today = new Date();
+  const initYear = today.getFullYear();
+  const initMonth = today.getMonth() + 1;
+  const initDay = today.getDate();
+  const initDateStr = `${initYear}-${initMonth.toString().padStart(2, '0')}-${initDay.toString().padStart(2, '0')}`;
+
+  const [currentYear, setCurrentYear] = useState<number>(initYear);
+  const [currentMonth, setCurrentMonth] = useState<number>(initMonth);
+  const [selectedDate, setSelectedDate] = useState<string>(initDateStr);
   const [language, setLanguage] = useState<'te' | 'en'>('te');
   const [selectedCity, setSelectedCity] = useState<CityOption>(TELUGU_CITIES[0]); // Default Hyderabad
   const [activeTab, setActiveTab] = useState<'calendar' | 'day' | 'festivals' | 'muhurtam' | 'reminders' | 'docs'>('calendar');
@@ -30,6 +36,7 @@ export default function App() {
   const [isCityModalOpen, setIsCityModalOpen] = useState<boolean>(false);
   const [isApkModalOpen, setIsApkModalOpen] = useState<boolean>(false);
   const [isConverterOpen, setIsConverterOpen] = useState<boolean>(false);
+  const [isSankashtaModalOpen, setIsSankashtaModalOpen] = useState<boolean>(false);
 
   // Reminders count for quick badge
   const [remindersCount, setRemindersCount] = useState<number>(0);
@@ -124,7 +131,8 @@ export default function App() {
     const today = new Date();
     const y = today.getFullYear();
     const m = today.getMonth() + 1;
-    const dStr = today.toISOString().split('T')[0];
+    const d = today.getDate();
+    const dStr = `${y}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
     setCurrentYear(y);
     setCurrentMonth(m);
     setSelectedDate(dStr);
@@ -187,6 +195,7 @@ export default function App() {
         onSelectTab={setActiveTab}
         onPrint={handlePrint}
         onDownloadApk={() => setIsApkModalOpen(true)}
+        onOpenSankashta={() => setIsSankashtaModalOpen(true)}
         samvatsaraDisplay={firstDay ? `${firstDay.samvatsaraTelugu} నామ సం॥` : undefined}
         teluguMonthDisplay={firstDay ? `${firstDay.monthTelugu} (${firstDay.ayanaTelugu})` : undefined}
       />
@@ -212,13 +221,23 @@ export default function App() {
 
             {/* Quick Actions Bar */}
             <div className="flex flex-wrap items-center gap-2 text-xs">
+              {/* Sankashta Chaturthi Modal Trigger Button */}
+              <button
+                onClick={() => setIsSankashtaModalOpen(true)}
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-700 to-amber-600 hover:from-amber-600 hover:to-amber-500 text-slate-950 font-bold shadow-md transition-all cursor-pointer"
+                title={isTe ? 'సంకష్టహర చతుర్థి తేదీలు & చంద్రోదయ సమయాలు' : 'Sankashta Chaturthi Dates & Moonrise Timings'}
+              >
+                <span>🐘</span>
+                <span>{isTe ? 'సంకష్టహర చతుర్థి' : 'Sankashta Chaturthi'}</span>
+              </button>
+
               {/* Reminders Button with count */}
               <button
                 onClick={() => setActiveTab('reminders')}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold shadow-md transition-all cursor-pointer"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-950/70 border border-amber-700/60 hover:bg-amber-900 text-amber-200 font-bold shadow-sm transition-all cursor-pointer"
                 title="Manage All Saved Reminders & Notes"
               >
-                <Bell className="w-3.5 h-3.5" />
+                <Bell className="w-3.5 h-3.5 text-amber-400" />
                 <span>{isTe ? 'నా రిమైండర్లు' : 'My Reminders'}</span>
                 {remindersCount > 0 && (
                   <span className="ml-1 px-1.5 py-0.2 rounded-full bg-slate-950 text-amber-300 text-[10px] font-mono">
@@ -240,7 +259,7 @@ export default function App() {
               {/* Location Picker */}
               <button
                 onClick={() => setIsCityModalOpen(true)}
-                className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-900 border border-amber-900/40 hover:bg-slate-850 hover:border-amber-700/60 transition-colors"
+                className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-900 border border-amber-900/40 hover:bg-slate-850 hover:border-amber-700/60 transition-colors cursor-pointer"
               >
                 <MapPin className="w-3.5 h-3.5 text-amber-400" />
                 <span>{selectedCity.nameTelugu}</span>
@@ -249,7 +268,7 @@ export default function App() {
               {/* Direct APK Download Button */}
               <button
                 onClick={() => setIsApkModalOpen(true)}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-700/50 text-emerald-300 hover:bg-emerald-900 transition-colors font-semibold"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-700/50 text-emerald-300 hover:bg-emerald-900 transition-colors font-semibold cursor-pointer"
               >
                 <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{isTe ? 'APK డౌన్‌లోడ్' : 'Download APK'}</span>
@@ -258,17 +277,9 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 1: MAIN SECTION - CALENDAR + SANKASHTA CHATURTHI DATES */}
+        {/* TAB 1: MAIN SECTION - CALENDAR GRID */}
         {activeTab === 'calendar' && (
           <div className="space-y-6">
-            {/* FEATURED: SANKASHTA CHATURTHI DATES SECTION RIGHT IN MAIN SECTION! */}
-            <SankashtaChaturthiSection
-              currentYear={currentYear}
-              cityName={selectedCity.nameTelugu}
-              onSelectDate={handleSelectDate}
-              language={language}
-            />
-
             {/* Standard Calendar Grid (English 1, 2, 3 Universal Digits) */}
             <CalendarGrid
               days={monthDays}
@@ -383,6 +394,16 @@ export default function App() {
       <ApkDownloadBanner
         isOpen={isApkModalOpen}
         onClose={() => setIsApkModalOpen(false)}
+        language={language}
+      />
+
+      {/* Sankashta Chaturthi Modal - Opens ONLY when user clicks the button! */}
+      <SankashtaChaturthiSection
+        isOpen={isSankashtaModalOpen}
+        onClose={() => setIsSankashtaModalOpen(false)}
+        currentYear={currentYear}
+        cityName={selectedCity.nameTelugu}
+        onSelectDate={handleSelectDate}
         language={language}
       />
 

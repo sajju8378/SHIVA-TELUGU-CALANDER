@@ -29,6 +29,7 @@ interface HeaderProps {
   onSelectTab: (tab: 'calendar' | 'day' | 'festivals' | 'muhurtam' | 'reminders' | 'docs') => void;
   onPrint: () => void;
   onDownloadApk: () => void;
+  onOpenSankashta?: () => void;
   samvatsaraDisplay?: string;
   teluguMonthDisplay?: string;
 }
@@ -58,6 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectTab,
   onPrint,
   onDownloadApk,
+  onOpenSankashta,
   samvatsaraDisplay,
   teluguMonthDisplay,
 }) => {
@@ -262,6 +264,17 @@ export const Header: React.FC<HeaderProps> = ({
             <Clock className="w-3.5 h-3.5" />
             <span className="font-telugu">{isTe ? 'ముహూర్తాలు' : 'Muhurtams'}</span>
           </button>
+
+          {onOpenSankashta && (
+            <button
+              onClick={onOpenSankashta}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all text-amber-300 hover:text-amber-100 hover:bg-slate-900 bg-amber-950/40 border border-amber-800/40 cursor-pointer"
+              title={isTe ? 'సంకష్టహర చతుర్థి తేదీలు & చంద్రోదయ సమయాలు' : 'Sankashta Chaturthi Dates & Moonrise'}
+            >
+              <span>🐘</span>
+              <span className="font-telugu">{isTe ? 'సంకష్టహర చతుర్థి' : 'Sankashta Chaturthi'}</span>
+            </button>
+          )}
 
           <button
             onClick={() => onSelectTab('docs')}
