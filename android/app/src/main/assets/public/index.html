@@ -17,18 +17,40 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Noto+Sans+Telugu:wght@300;400;500;600;700;800&family=Ramabhadra&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="./assets/index-ChxW0ayG.js"></script>
+    <script>
+      // When accessed from GitHub Pages root, redirect to the compiled /docs/ version
+      if (window.location.hostname.endsWith('github.io') && !window.location.pathname.includes('/docs')) {
+        var base = window.location.pathname.replace(/\/+$/, '');
+        window.location.replace(base + '/docs/');
+      }
+    </script>
+    <script type="module" crossorigin src="./assets/index-DrkYHy02.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-TcD_lRi3.css">
   </head>
   <body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-amber-500 selection:text-slate-950">
     <div id="root"></div>
 
     <script>
+      // Clear service workers and caches immediately in AI Studio / development environments
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(err => {
-            console.log('SW registration note:', err);
+        if (window.location.hostname.includes('run.app') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for (let r of registrations) {
+              r.unregister();
+            }
           });
-        });
+          if ('caches' in window) {
+            caches.keys().then(function(names) {
+              for (let name of names) caches.delete(name);
+            });
+          }
+        } else {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(err => {
+              console.log('SW registration note:', err);
+            });
+          });
+        }
       }
     </script>
   </body>

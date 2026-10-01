@@ -17,30 +17,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Noto+Sans+Telugu:wght@300;400;500;600;700;800&family=Ramabhadra&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      // When accessed from GitHub Pages root, redirect to the compiled /docs/ version
+      if (window.location.hostname.endsWith('github.io') && !window.location.pathname.includes('/docs')) {
+        var base = window.location.pathname.replace(/\/+$/, '');
+        window.location.replace(base + '/docs/');
+      }
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
   </head>
   <body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-amber-500 selection:text-slate-950">
     <div id="root"></div>
-
-    <script type="module">
-      const isGitHubPages = window.location.hostname.endsWith('github.io');
-      if (isGitHubPages) {
-        // Automatically inject compiled CSS and JS if deployed on GitHub Pages root
-        const css = document.createElement('link');
-        css.rel = 'stylesheet';
-        css.crossOrigin = 'anonymous';
-        css.href = './docs/assets/index-TcD_lRi3.css';
-        document.head.appendChild(css);
-
-        const js = document.createElement('script');
-        js.type = 'module';
-        js.crossOrigin = 'anonymous';
-        js.src = './docs/assets/index-DYZHctKy.js';
-        document.body.appendChild(js);
-      } else {
-        // Standard Vite entry for AI Studio and development
-        import('/src/main.tsx');
-      }
-    </script>
 
     <script>
       // Clear service workers and caches immediately in AI Studio / development environments
