@@ -9,8 +9,8 @@
     <meta property="og:description" content="Authentic Telugu Hindu Panchangam and Calendar for 2027 with high-precision astronomical calculations, Amanta lunar system, Tithi, Nakshatra, Muhurtam, and Festivals." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="icon" type="image/svg+xml" href="/icon-192.svg" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="./icon-192.svg" />
+    <link rel="manifest" href="./manifest.json" />
     <meta name="theme-color" content="#991b1b" />
     
     <!-- Google Fonts for Telugu Typography -->
@@ -20,7 +20,27 @@
   </head>
   <body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-amber-500 selection:text-slate-950">
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+
+    <script type="module">
+      const isGitHubPages = window.location.hostname.endsWith('github.io');
+      if (isGitHubPages) {
+        // Automatically inject compiled CSS and JS if deployed from root
+        const css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.crossOrigin = 'anonymous';
+        css.href = './docs/assets/index-TcD_lRi3.css';
+        document.head.appendChild(css);
+
+        const js = document.createElement('script');
+        js.type = 'module';
+        js.crossOrigin = 'anonymous';
+        js.src = './docs/assets/index-DYZHctKy.js';
+        document.body.appendChild(js);
+      } else {
+        // Standard Vite dev mode for AI Studio & local dev server
+        import('/src/main.tsx');
+      }
+    </script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build && tsx scripts/postbuild.ts",
+    "build": "vite build && node scripts/postbuild.js",
     "start": "tsx server.ts",
     "preview": "vite preview",
     "test": "tsx test/panchangam.test.ts",

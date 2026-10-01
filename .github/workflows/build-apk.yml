@@ -40,9 +40,6 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Make Gradlew Executable
         run: chmod +x ./android/gradlew
 
@@ -53,7 +50,7 @@ jobs:
       - name: Collect Built APK
         run: |
           mkdir -p build-output
-          APK_FILE=$(find android/app/build/outputs/apk/debug -name "*.apk" 2>/dev/null | head -n 1)
+          APK_FILE=$(find android/app/build/outputs/apk -name "*.apk" 2>/dev/null | head -n 1)
           if [ -z "$APK_FILE" ]; then
             APK_FILE=$(find android -name "*.apk" 2>/dev/null | head -n 1)
           fi

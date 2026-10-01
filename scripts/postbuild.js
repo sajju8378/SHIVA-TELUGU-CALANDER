@@ -1,13 +1,13 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
 
-console.log('Running postbuild for GitHub Pages & standalone deployment...');
+console.log('Running postbuild for GitHub Pages & Android sync...');
 
 const rootDir = process.cwd();
 const distDir = path.join(rootDir, 'dist');
 const docsDir = path.join(rootDir, 'docs');
 
-function copyRecursive(src: string, dest: string) {
+function copyRecursive(src, dest) {
   if (!fs.existsSync(src)) return;
   const stats = fs.statSync(src);
   if (stats.isDirectory()) {
@@ -20,17 +20,17 @@ function copyRecursive(src: string, dest: string) {
   }
 }
 
-// 1. Copy complete dist build into docs directory for GitHub Pages (/docs deployment)
+// 1. Copy complete dist into docs for GitHub Pages
 if (fs.existsSync(distDir)) {
   copyRecursive(distDir, docsDir);
 }
 
-// 2. Ensure .nojekyll is in dist and docs
+// 2. Ensure .nojekyll in root, dist, and docs
 fs.writeFileSync(path.join(rootDir, '.nojekyll'), '', 'utf-8');
 if (fs.existsSync(distDir)) fs.writeFileSync(path.join(distDir, '.nojekyll'), '', 'utf-8');
 if (fs.existsSync(docsDir)) fs.writeFileSync(path.join(docsDir, '.nojekyll'), '', 'utf-8');
 
-// 3. Ensure 404.html is in dist and docs for GitHub Pages SPA routing
+// 3. Ensure 404.html in dist and docs
 const notFoundHtml = `<!DOCTYPE html>
 <html>
   <head>
@@ -49,11 +49,23 @@ const notFoundHtml = `<!DOCTYPE html>
 if (fs.existsSync(distDir)) fs.writeFileSync(path.join(distDir, '404.html'), notFoundHtml, 'utf-8');
 if (fs.existsSync(docsDir)) fs.writeFileSync(path.join(docsDir, '404.html'), notFoundHtml, 'utf-8');
 
-// 4. Ensure ads.txt is in dist and docs
+// 4. Ensure root also has static assets for root deployment
+const rootAssetsDir = path.join(rootDir, 'assets');
+if (fs.existsSync(path.join(distDir, 'assets'))) {
+  copyRecursive(path.join(distDir, 'assets'), rootAssetsDir);
+}
+
+const rootFiles = ['manifest.json', 'sw.js', 'icon-192.svg', 'icon-512.svg'];
+for (const f of rootFiles) {
+  const p = path.join(distDir, f);
+  if (fs.existsSync(p)) fs.copyFileSync(p, path.join(rootDir, f));
+}
+
+// 5. Ensure ads.txt is in dist and docs
 const adsTxtSource = path.join(rootDir, 'ads.txt');
 if (fs.existsSync(adsTxtSource)) {
   if (fs.existsSync(distDir)) fs.copyFileSync(adsTxtSource, path.join(distDir, 'ads.txt'));
   if (fs.existsSync(docsDir)) fs.copyFileSync(adsTxtSource, path.join(docsDir, 'ads.txt'));
 }
 
-console.log('Postbuild finished successfully! docs/ accurately mirrors dist.');
+console.log('Postbuild finished successfully!');
